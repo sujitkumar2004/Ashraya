@@ -36,14 +36,17 @@ const Register: React.FC = () => {
     setIsLoading(true);
 
     try {
+      console.log('Submitting registration form...');
       await register({
         name: formData.name,
         email: formData.email,
         password: formData.password,
         role: formData.role
       });
+      console.log('Registration successful, navigating to dashboard...');
       navigate('/dashboard');
     } catch (err: any) {
+      console.error('Registration failed:', err);
       setError(err.message);
     } finally {
       setIsLoading(false);

@@ -11,11 +11,13 @@ const router = express.Router();
 // @access  Public
 router.post('/register', validateRegistration, async (req, res) => {
   try {
+    console.log('Registration attempt:', req.body);
     const { name, email, password, role } = req.body;
 
     // Check if user already exists
     const existingUser = await User.findByEmail(email);
     if (existingUser) {
+      console.log('User already exists:', email);
       return res.status(400).json({ 
         message: 'User with this email already exists' 
       });
@@ -29,18 +31,21 @@ router.post('/register', validateRegistration, async (req, res) => {
       role: role || 'patient'
     });
 
+    console.log('Saving user to database...');
     await user.save();
+    console.log('User saved successfully');
 
     // Generate JWT token
     const token = jwt.sign(
       { userId: user._id, role: user.role },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || 'fallback-secret-key',
       { expiresIn: '7d' }
     );
 
     // Update last login
     await user.updateLastLogin();
 
+    console.log('Registration successful for:', user.email);
     res.status(201).json({
       message: 'User registered successfully',
       token,
@@ -53,9 +58,11 @@ router.post('/register', validateRegistration, async (req, res) => {
     });
   } catch (error) {
     console.error('Registration error:', error);
+    console.error('Error stack:', error.stack);
     res.status(500).json({ 
       message: 'Registration failed',
-      error: error.message 
+      error: error.message,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 });

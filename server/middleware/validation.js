@@ -18,8 +18,8 @@ export const validateRegistration = [
     .trim()
     .isLength({ min: 2, max: 100 })
     .withMessage('Name must be between 2 and 100 characters')
-    .matches(/^[a-zA-Z\s]+$/)
-    .withMessage('Name can only contain letters and spaces'),
+    .matches(/^[a-zA-Z\s.'-]+$/)
+    .withMessage('Name can only contain letters, spaces, periods, apostrophes, and hyphens'),
   
   body('email')
     .isEmail()
@@ -29,8 +29,8 @@ export const validateRegistration = [
   body('password')
     .isLength({ min: 6, max: 128 })
     .withMessage('Password must be between 6 and 128 characters')
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-    .withMessage('Password must contain at least one lowercase letter, one uppercase letter, and one number'),
+    .notEmpty()
+    .withMessage('Password is required'),
   
   body('role')
     .optional()

@@ -51,6 +51,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await axios.get(`${API_URL}/auth/me`);
       setUser(response.data.user);
     } catch (error) {
+      console.error('Auth check failed:', error);
       localStorage.removeItem('token');
       delete axios.defaults.headers.common['Authorization'];
     } finally {
@@ -67,19 +68,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       setUser(user);
     } catch (error: any) {
+      console.error('Login error:', error);
       throw new Error(error.response?.data?.message || 'Login failed');
     }
   };
 
   const register = async (userData: any) => {
     try {
+      console.log('Attempting registration with:', userData);
       const response = await axios.post(`${API_URL}/auth/register`, userData);
+      console.log('Registration response:', response.data);
       const { token, user } = response.data;
       
       localStorage.setItem('token', token);
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       setUser(user);
     } catch (error: any) {
+      console.error('Registration error:', error);
+      console.error('Error response:', error.response?.data);
       throw new Error(error.response?.data?.message || 'Registration failed');
     }
   };
